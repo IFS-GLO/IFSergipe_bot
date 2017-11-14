@@ -1,6 +1,8 @@
 import json
 
 from pprint import pprint
+
+from django.shortcuts import render
 from django.views import generic
 from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -9,9 +11,9 @@ from bot.settings import SECRET_KEY, WIT_ACCESS_TOKEN
 
 from wit import Wit
 
-from .utils import run_actions
+from .bot import Bot
 
-# Setup Wit Client
+
 client = Wit(access_token=WIT_ACCESS_TOKEN)
 
 
@@ -33,6 +35,10 @@ class BotView(generic.View):
         for entry in incoming_message['entry']:
             for message in entry['messaging']:
                 if 'message' in message:
-                    run_actions(client, message)
+                    Bot.run_actions(client, message)
 
         return HttpResponse()
+
+
+def get_curl_courses(request):
+    pass
