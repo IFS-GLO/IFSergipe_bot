@@ -1,6 +1,6 @@
 from pprint import pprint
 
-from .facebook import Facebook
+from .messenger import *
 
 
 class Bot:
@@ -18,14 +18,18 @@ class Bot:
 
         return val['value'] if isinstance(val, dict) else val
 
-    def run_actions(client, message):
-        messenger = Facebook()
-        messenger.sender_id = message['sender']['id']
-        messenger.text = message['message']['text']
+    """def run_actions(client, message):
+        messenger = Facebook()  # Create a Facebook instance
+        messenger.sender_id = message['sender']['id']  # save sender id
+        messenger.text = message['message']['text']  # save message received from user
+
+        pprint(messenger.get_profile_info())
 
         resp = client.message(messenger.text)
+        # pprint(messenger.sender_id)
 
-        pprint(resp)
+        # pprint(resp)
 
         Facebook.send_message(messenger)
         # send(sender_id, resp['entities']['datetime'][0]['value'])
+    """
