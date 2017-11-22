@@ -11,10 +11,10 @@ class Bot(models.Model):
 
 
 class Chat(models.Model):
-    running = False
     username = models.TextField(null=True, verbose_name='Usuário')
     first_name = models.TextField(null=True, verbose_name='Primeiro nome')
     last_name = models.TextField(null=True, verbose_name='Último nome')
+    running = models.BooleanField()
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Criado em')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Última utilização')
@@ -28,3 +28,9 @@ class ChatUpdate(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Criado em')
 
     chat = models.ForeignKey(Chat)
+
+
+class Context(models.Model):
+    text = models.TextField()
+    chat = models.ForeignKey(Chat)
+    position = models.IntegerField()

@@ -89,7 +89,12 @@ DATABASES = {
     },
 }
 
-DATABASE_ROUTERS = ['bot.chat.routers.ChatRouter', 'glpi.routers.TicketRouter', ]
+DATABASE_ROUTERS = [
+    'bot.chat.routers.ChatRouter',
+    'bot.chat.routers.ChatUpdateRouter',
+    'bot.chat.routers.ChatContextRouter',
+    'glpi.routers.TicketRouter',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
