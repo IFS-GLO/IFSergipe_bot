@@ -14,7 +14,7 @@ class Chat(models.Model):
     username = models.TextField(null=True, verbose_name='Usuário')
     first_name = models.TextField(null=True, verbose_name='Primeiro nome')
     last_name = models.TextField(null=True, verbose_name='Último nome')
-    running = models.BooleanField()
+    is_running = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Criado em')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Última utilização')

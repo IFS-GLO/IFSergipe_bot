@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='chat',
-            name='running',
+            name='is_running',
             field=models.BooleanField(default=False),
             preserve_default=False,
         ),
