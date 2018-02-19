@@ -34,3 +34,11 @@ class Context(models.Model):
     text = models.TextField()
     chat = models.ForeignKey(Chat)
     position = models.IntegerField()
+
+
+class Command(models.Model):
+    title = models.TextField(max_length=45, verbose_name='Título')
+    trigger = models.TextField(max_length=25, verbose_name='Comando')
+    message = models.TextField(verbose_name='Mensagem')
+    arguments = models.TextField(blank=True, verbose_name='Argumentos')
+    next_trigger = models.ForeignKey('self', blank=True, null=True, verbose_name='Próximo comando')
