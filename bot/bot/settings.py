@@ -24,6 +24,7 @@ SECRET_KEY = 'n+zkfdg&tuhcr8dzgl!rybvqebo-+jx004(5072e8d@(oir2)8'
 WIT_ACCESS_TOKEN = 'DUNH6WRZEIUZLULXLJFG3ATQX6RVTQFX'
 TELEGRAM_ACCESS_TOKEN = '451087671:AAEpKcBxN6qx3z4PNs61f6PChlGpBzWc52Y'
 FACEBOOK_ACCESS_TOKEN = 'EAAFI3sCU3yABAIGT2I4AL9gqRBwsYuve4pgd661XgsqrZBSaqlOXB40E5wz9OyQGweeAev6uPi98zbC0iJuCo1pXtrJnRZCnUgJVv8lcRahHsZAvoGJ2IG43zHPHBXZB1Pvhc11b666hGkME3N7cPoYK0mfCWJ97cllkLsGTCeXHZCdyroA19'
+WEBHOOK = 'https://api.telegram.org/bot451087671:AAEpKcBxN6qx3z4PNs61f6PChlGpBzWc52Y/setWebhook?url=https://824cf6b0.ngrok.io/bot/chat/telegram/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -93,6 +94,8 @@ DATABASE_ROUTERS = [
     'bot.chat.routers.ChatRouter',
     'bot.chat.routers.ChatUpdateRouter',
     'bot.chat.routers.ChatContextRouter',
+    'bot.chat.routers.ChatCommandRouter',
+
     'glpi.routers.TicketRouter',
 ]
 
