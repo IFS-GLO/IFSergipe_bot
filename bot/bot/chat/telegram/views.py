@@ -9,16 +9,13 @@ from django.views.decorators.csrf import csrf_exempt
 from telegram.ext import Updater
 
 from bot.chat.telegram.handlers import commands
-from bot.settings import TELEGRAM_ACCESS_TOKEN
-from bot.chat.models import Bot
+from bot.settings import TELEGRAM_ACCESS_TOKEN, WEBHOOK
+from bot.chat.models import *
 
 bot_model = Bot
 
 telegram_bot = telegram.Bot(token=TELEGRAM_ACCESS_TOKEN)
-telegram_bot.setWebhook(
-    'https://api.telegram.org/bot451087671:AAEpKcBxN6qx3z4PNs61f6PChlGpBzWc52Y/setWebhook?'
-    'url=https://08d260a0.ngrok.io/bot/chat/telegram/'
-)
+telegram_bot.setWebhook(WEBHOOK)
 
 updater = Updater(token=TELEGRAM_ACCESS_TOKEN)
 dispatcher = updater.dispatcher
@@ -28,11 +25,6 @@ dispatcher = updater.dispatcher
 # não sobrescreverá informações de outro
 
 class TelegramWebhookView(generic.View):
-    def run_next_command(self, command, chat, message):
-        instance = command['next_command'](message)
-
-        if command['template']:
-            bot_model.running = command['template'](telegram_bot, chat, instance)
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
@@ -41,18 +33,42 @@ class TelegramWebhookView(generic.View):
     def post(self, request, *args, **kwargs):
         incoming_message = json.loads(request.body.decode('utf-8'))
 
-        # TODO: Create message Model
         if incoming_message['message']:
             chat = incoming_message['message']['chat']
-            message = incoming_message['message'].get('text')
 
-            command = commands.get(message.split()[0].lower())  # check if command exist in list
+            # check if bot is running
+            if Chat.objects.filter(is_running=True):
+                pass
 
-            if bot_model.running:
-                self.run_next_command(bot_model.next_command, chat, message)
+            else:
+                # check if chat exist
+                if Chat.objects.filter(id=int(chat['id'])).exists() is False:
+                    chat = Chat(id=int(chat['id']), username=chat['username'], first_name=chat['first_name'], last_name=chat['last_name'], is_running=True).save()
 
+            message = incoming_message['message'].get('text')  # get the input msg
+            command = Command.objects.filter(trigger=message)[0]
+
+            # if command exist
             if command:
-                bot_model.running = True
-                bot_model.next_command = command(telegram_bot, chat)
+                text = command.message
+
+                # check if exist arguments
+                if command.arguments is not '':
+                    # TODO: a function to check if exist more than one arg
+                    text = text.format(chat[command.arguments])
+
+                telegram_bot.send_message(
+                    parse_mode='Markdown',
+                    chat_id=chat['id'],
+                    text=text,
+                )
+
+            else: # if not exist send a msg to user
+                text = 'Comando não localizado.'
+                telegram_bot.send_message(
+                    parse_mode='Markdown',
+                    chat_id=chat['id'],
+                    text=text,
+                )
 
         return HttpResponse()
