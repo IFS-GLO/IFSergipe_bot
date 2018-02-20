@@ -8,7 +8,7 @@ from django.http.response import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from telegram.ext import Updater
 
-from bot.chat.telegram.handlers import commands
+from bot.chat.telegram.handlers import send_message
 from bot.settings import TELEGRAM_ACCESS_TOKEN, WEBHOOK
 from bot.chat.models import *
 
@@ -19,10 +19,6 @@ telegram_bot.setWebhook(WEBHOOK)
 
 updater = Updater(token=TELEGRAM_ACCESS_TOKEN)
 dispatcher = updater.dispatcher
-
-# TODO: Armazenar informações do chat no banco de dados
-# para gerenciamento das atividades, assim um chat
-# não sobrescreverá informações de outro
 
 class TelegramWebhookView(generic.View):
 
@@ -43,32 +39,24 @@ class TelegramWebhookView(generic.View):
             else:
                 # check if chat exist
                 if Chat.objects.filter(id=int(chat['id'])).exists() is False:
-                    chat = Chat(id=int(chat['id']), username=chat['username'], first_name=chat['first_name'], last_name=chat['last_name'], is_running=True).save()
+                    chat = Chat(id=int(chat['id']), username=chat['username'], first_name=chat['first_name'], last_name=chat['last_name']).save()
 
             message = incoming_message['message'].get('text')  # get the input msg
-            command = Command.objects.filter(trigger=message)[0]
 
-            # if command exist
-            if command:
-                text = command.message
+            # Check if message is a command
+            if message[0] == '/':
+                command = Command.objects.filter(trigger=message.split()[0].lower())  # check if command exist in list
 
-                # check if exist arguments
-                if command.arguments is not '':
-                    # TODO: a function to check if exist more than one arg
-                    text = text.format(chat[command.arguments])
+                # if command exist
+                if command:
+                    response = send_message(telegram_bot, chat, message)
 
-                telegram_bot.send_message(
-                    parse_mode='Markdown',
-                    chat_id=chat['id'],
-                    text=text,
-                )
+                    update = ChatUpdate()
+                    update.command = message
+                    update.chat = Chat.objects.get(id=chat['id'])
+                    update.save()
 
-            else: # if not exist send a msg to user
-                text = 'Comando não localizado.'
-                telegram_bot.send_message(
-                    parse_mode='Markdown',
-                    chat_id=chat['id'],
-                    text=text,
-                )
+                else:
+                    send_message(telegram_bot, chat, 'unknow')
 
         return HttpResponse()
