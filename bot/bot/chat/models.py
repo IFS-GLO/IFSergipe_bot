@@ -10,6 +10,10 @@ class Bot(models.Model):
         managed = False
 
 
+class NotifyCategory(models.Model):
+    name = models.TextField(max_length=25, verbose_name='Nome')
+
+
 class Chat(models.Model):
     username = models.TextField(null=True, verbose_name='Usuário')
     first_name = models.TextField(null=True, verbose_name='Primeiro nome')
@@ -19,8 +23,14 @@ class Chat(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Criado em')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Última utilização')
 
+    notify = models.ManyToManyField(NotifyCategory)
+
     def __str__(self):
         return str(self.id)
+
+
+    def notification(self):
+        pass
 
 
 class ChatUpdate(models.Model):
@@ -40,5 +50,5 @@ class Command(models.Model):
     title = models.TextField(max_length=45, verbose_name='Título')
     trigger = models.TextField(max_length=25, verbose_name='Comando')
     message = models.TextField(verbose_name='Mensagem')
-    arguments = models.TextField(blank=True, verbose_name='Argumentos')
-    next_trigger = models.ForeignKey('self', blank=True, null=True, verbose_name='Próximo comando')
+    arguments = models.TextField(blank=True, null=True, verbose_name='Argumentos')
+    next_trigger = models.TextField(max_length=60, blank=True, null=True, verbose_name='Próximo comando')
